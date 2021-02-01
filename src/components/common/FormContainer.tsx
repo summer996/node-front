@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { createElement, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
 import { Form } from 'antd';
-import { FormProps } from 'antd/lib/form';
-import { FormComponentProps } from 'antd/lib/form/Form';
+import { FormProps, FormInstance } from 'antd/lib/form';
 
 import { FormInput, FormDate, FormSelect } from './formComponents';
+
+import './index.css'
+
+
+const FormItem = Form.Item;
 
 const FormComponents: any = {
   input: FormInput,
@@ -14,18 +18,62 @@ const FormComponents: any = {
 interface IField {
   filedType: string;
   label?: string;
-  value?: string;
+  name?: string;
   [key: string]: any;
 }
 
-interface FormContainerProps extends FormProps {
+interface IProps {
   fields: IField[];
-  form: FormComponentProps['form'];
   formData?: any;
+  [key: string]: any;
 }
 
-const FormContainer = (props: FormContainerProps, ref: any) => {
-  return 
-}
+const FormContainer = (props: IProps, ref: any) => {
+  let { formData, fields } = props;
+  const [form] = Form.useForm();
 
-export defalut Form;
+  useImperativeHandle(ref, () => ({
+    ...form,
+  }));
+
+  const onSubmit = () => {};
+
+  //表单回显
+  useEffect(() => {
+    form.setFieldsValue(formData);
+  }, [formData]);
+
+  const formItemLayout = {
+    labelCol: {
+      span: 7,
+    },
+    wrapperCol: {
+      span: 12,
+    },
+  };
+
+  const renderFormItem = (item: any) => {
+    let { labelCol, wrapperCol, type } = item;
+    let defaultLabelCol = { span: 7 }, defaultWrapperCol = { span: 12 };
+    let props = {
+      labelCol: labelCol || defaultLabelCol,
+      wrapperCol: wrapperCol || defaultWrapperCol,
+      form,
+    };
+    return FormComponents[type]({ ...item, ...props })
+  }
+
+ 
+
+  return (
+    <Form form={form} className={`custom-form`}>
+      {fields.map((item: any) => {
+        let { type } = item;
+        item.type = type || 'input';
+        return renderFormItem(item);
+      })}
+    </Form>
+  );
+};
+
+export default forwardRef(FormContainer);

@@ -1,0 +1,7 @@
+.custom-form {
+  display: grid;
+  /* //函数产生的是一个长度范围 */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 320px));
+  grid-row-gap: 0;
+  grid-column-gap: 20px;
+}
